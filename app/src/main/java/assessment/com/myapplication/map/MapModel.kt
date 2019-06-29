@@ -1,12 +1,11 @@
 package assessment.com.myapplication.map
 
-import android.os.AsyncTask
 import android.util.Log
 import androidx.room.Room
-import assessment.com.myapplication.R
 import assessment.com.myapplication.data.GTService
 import assessment.com.myapplication.data.Location
 import assessment.com.myapplication.data.room.LocationDatabase
+import assessment.com.myapplication.data.room.LocationsTask
 import assessment.com.myapplication.data.room.RoomLocation
 import retrofit2.Call
 import retrofit2.Callback
@@ -25,10 +24,10 @@ class MapModel constructor(private val presenter: MapContract.MapPresenter) : Ma
     override fun viewCreated() {
         presenter.provideContext().let { context ->
             database =
-                Room.databaseBuilder(context, LocationDatabase::class.java, context.getString(R.string.database_name))
+                Room.databaseBuilder(context, LocationDatabase::class.java, DATABASE_NAME)
                     .build()
             retrofit = Retrofit.Builder()
-                .baseUrl(context.getString(R.string.base_url))
+                .baseUrl(BASE_URL)
                 .addConverterFactory(GsonConverterFactory.create())
                 .build()
             service = retrofit.create(GTService::class.java)
@@ -36,14 +35,12 @@ class MapModel constructor(private val presenter: MapContract.MapPresenter) : Ma
     }
 
     override fun fetchLocations() {
-
         val db = LocationsTask().execute(database).get()
-        if(db.isNotEmpty()) {
+        if (db.isNotEmpty()) {
             presenter.onLocationsLoaded(db)
         } else {
             fetchLocationsRemoteAndStore()
         }
-
     }
 
     private fun fetchLocationsRemoteAndStore() {
@@ -71,16 +68,8 @@ class MapModel constructor(private val presenter: MapContract.MapPresenter) : Ma
         })
     }
 
-    private class LocationsTask : AsyncTask<LocationDatabase, Unit, List<Location>>() {
-        override fun doInBackground(vararg database: LocationDatabase?): List<Location> =
-            database.get(0)?.locationDao()?.all?.map { roomLocation ->
-                Location(
-                    roomLocation.id,
-                    roomLocation.name,
-                    roomLocation.latitude,
-                    roomLocation.longitude,
-                    roomLocation.description
-                )
-            } ?: mutableListOf()
+    companion object {
+        const val BASE_URL = "https://annetog.gotenna.com/development/scripts/"
+        const val DATABASE_NAME = "location-database"
     }
 }

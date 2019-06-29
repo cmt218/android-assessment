@@ -24,12 +24,13 @@ class MapFragment : Fragment(), MapContract.MapView, OnMapReadyCallback {
     private lateinit var mapView: MapView
     private lateinit var symbolManager: SymbolManager
     private lateinit var ctx: Context
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         ctx = context ?: return
         presenter = MapPresenter(this)
         presenter.viewCreated()
-        Mapbox.getInstance(ctx, getString(R.string.mapbox_key));
+        Mapbox.getInstance(ctx, MAPBOX_KEY);
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -100,6 +101,7 @@ class MapFragment : Fragment(), MapContract.MapView, OnMapReadyCallback {
     override fun provideContext(): Context = ctx
 
     companion object {
+        const val MAPBOX_KEY = "pk.eyJ1IjoidG9tbGluc29uNjMxIiwiYSI6ImNqeGR5aGtseTBqZHIzeW13bnV6ZXFtdWgifQ.phJvUqBz9mgl2GVz8o2zuA"
         const val MARKER_ICON = "marker_icon"
     }
 }

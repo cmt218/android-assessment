@@ -1,6 +1,3 @@
 <resources>
     <string name="app_name">Assessment</string>
-    <string name="base_url">"https://annetog.gotenna.com/development/scripts/"</string>
-    <string name="database_name">location-database</string>
-    <string name="mapbox_key">pk.eyJ1IjoidG9tbGluc29uNjMxIiwiYSI6ImNqeGR5aGtseTBqZHIzeW13bnV6ZXFtdWgifQ.phJvUqBz9mgl2GVz8o2zuA</string>
 </resources>
