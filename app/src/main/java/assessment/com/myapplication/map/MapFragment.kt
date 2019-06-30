@@ -16,7 +16,6 @@ import assessment.com.myapplication.R
 import assessment.com.myapplication.data.Location
 import com.mapbox.mapboxsdk.Mapbox
 import com.mapbox.mapboxsdk.camera.CameraPosition
-import com.mapbox.mapboxsdk.camera.CameraUpdateFactory
 import com.mapbox.mapboxsdk.geometry.LatLng
 import com.mapbox.mapboxsdk.location.LocationComponent
 import com.mapbox.mapboxsdk.location.LocationComponentActivationOptions
@@ -42,7 +41,6 @@ class MapFragment : Fragment(), MapContract.MapView, OnMapReadyCallback {
     private lateinit var presenter: MapContract.MapPresenter
 
 
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         ctx = context ?: return
@@ -57,6 +55,7 @@ class MapFragment : Fragment(), MapContract.MapView, OnMapReadyCallback {
         mapView?.onCreate(savedInstanceState)
         mapView?.getMapAsync(this)
         locationButton = view.findViewById(R.id.my_location_button)
+
         return view
     }
 
@@ -69,9 +68,14 @@ class MapFragment : Fragment(), MapContract.MapView, OnMapReadyCallback {
                     style.addImage(MARKER_ICON, drawable)
                 } ?: Log.e(this.javaClass.simpleName, "failed to load marker resource")
                 symbolManager = mapView?.let { SymbolManager(it, mapboxMap, style) }
-                locationButton.setOnClickListener { enableLocation(style) }
+                locationButton.setOnClickListener { enableLocation(style, true) }
                 presenter.loadLocations()
                 zoomToLocation?.let { presenter.loadSingleLocation(it) }
+                if (ContextCompat.checkSelfPermission(ctx, Manifest.permission.ACCESS_FINE_LOCATION) ==
+                    PackageManager.PERMISSION_GRANTED
+                ) {
+                    enableLocation(style, false)
+                }
             }
         })
     }
@@ -94,17 +98,16 @@ class MapFragment : Fragment(), MapContract.MapView, OnMapReadyCallback {
             .target(coordinate)
             .zoom(16.0)
             .build()
-        mapboxMap?.animateCamera(CameraUpdateFactory.newCameraPosition(position))
+        mapboxMap?.cameraPosition = position
     }
 
     @SuppressWarnings("MissingPermission")
-    private fun enableLocation(style: Style) {
+    private fun enableLocation(style: Style, animateToPosition: Boolean) {
         if (ContextCompat.checkSelfPermission(ctx, Manifest.permission.ACCESS_FINE_LOCATION) ==
             PackageManager.PERMISSION_GRANTED
         ) {
-            val locationComponentOptions = LocationComponentOptions.builder(ctx)
-                .build()
-
+            val previous = mapboxMap?.cameraPosition
+            val locationComponentOptions = LocationComponentOptions.builder(ctx).build()
             val locationComponentActivationOptions = LocationComponentActivationOptions
                 .builder(ctx, style)
                 .locationComponentOptions(locationComponentOptions)
@@ -115,6 +118,12 @@ class MapFragment : Fragment(), MapContract.MapView, OnMapReadyCallback {
                 isLocationComponentEnabled = true
                 cameraMode = CameraMode.TRACKING
             }
+
+            if (!animateToPosition) {
+                previous?.let {
+                    mapboxMap?.cameraPosition = it
+                }
+            }
         } else {
             requestPermissions(arrayOf(Manifest.permission.ACCESS_FINE_LOCATION), PERMISSION_ACCESS_LOCATION)
         }
@@ -124,13 +133,12 @@ class MapFragment : Fragment(), MapContract.MapView, OnMapReadyCallback {
         if (requestCode == PERMISSION_ACCESS_LOCATION) {
             if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 mapboxMap?.style?.let {
-                    enableLocation(it)
+                    enableLocation(it, true)
                 }
             } else {
                 Toast.makeText(ctx, "Location permission not granted", Toast.LENGTH_LONG).show()
             }
         }
-
     }
 
     override fun onStart() {

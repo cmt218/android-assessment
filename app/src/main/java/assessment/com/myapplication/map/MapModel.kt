@@ -16,7 +16,6 @@ import retrofit2.converter.gson.GsonConverterFactory
 import java.util.concurrent.Executors
 
 class MapModel constructor(private val presenter: MapContract.MapPresenter) : MapContract.MapModel {
-
     private lateinit var database: LocationDatabase
     private lateinit var retrofit: Retrofit
     private lateinit var service: GTService
