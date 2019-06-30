@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">Assessment</string>
+    <string name="list">List</string>
+    <string name="view_all">View All</string>
 </resources>

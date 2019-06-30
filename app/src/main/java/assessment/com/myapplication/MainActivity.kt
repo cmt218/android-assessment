@@ -2,7 +2,7 @@ package assessment.com.myapplication
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
-import assessment.com.myapplication.map.MapFragment
+import assessment.com.myapplication.list.ListFragment
 
 class MainActivity : AppCompatActivity() {
 
@@ -12,7 +12,7 @@ class MainActivity : AppCompatActivity() {
 
         supportFragmentManager
             .beginTransaction()
-            .replace(R.id.container, MapFragment())
+            .replace(R.id.container, ListFragment())
             .addToBackStack(null)
             .commit()
     }

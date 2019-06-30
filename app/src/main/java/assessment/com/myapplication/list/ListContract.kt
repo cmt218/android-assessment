@@ -1,7 +1,7 @@
-package assessment.com.myapplication.data.list
+package assessment.com.myapplication.list
 
 import android.content.Context
-import android.location.Location
+import assessment.com.myapplication.data.Location
 
 interface ListContract {
     interface ListView {

@@ -1,17 +1,17 @@
-package assessment.com.myapplication.data.list
+package assessment.com.myapplication.list
 
 import android.content.Context
-import android.location.Location
+import assessment.com.myapplication.data.Location
 
 class ListPresenter constructor(private val view: ListContract.ListView) : ListContract.ListPresenter {
     private val model: ListContract.ListModel = ListModel(this)
 
     override fun loadLocations() {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        model.fetchLocations()
     }
 
     override fun onLocationsLoaded(locations: List<Location>) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        view.renderListings(locations)
     }
 
     override fun provideContext(): Context = view.provideContext()

@@ -6,10 +6,14 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.TextView
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import assessment.com.myapplication.R
+import assessment.com.myapplication.data.Location
 import com.mapbox.mapboxsdk.Mapbox
+import com.mapbox.mapboxsdk.camera.CameraPosition
+import com.mapbox.mapboxsdk.camera.CameraUpdateFactory
 import com.mapbox.mapboxsdk.geometry.LatLng
 import com.mapbox.mapboxsdk.maps.MapView
 import com.mapbox.mapboxsdk.maps.MapboxMap
@@ -20,10 +24,12 @@ import com.mapbox.mapboxsdk.plugins.annotation.SymbolOptions
 
 
 class MapFragment : Fragment(), MapContract.MapView, OnMapReadyCallback {
+    private var zoomToLocation: Int? = null
+    private var mapboxMap: MapboxMap? = null
+    private lateinit var ctx: Context
     private lateinit var presenter: MapContract.MapPresenter
     private lateinit var mapView: MapView
     private lateinit var symbolManager: SymbolManager
-    private lateinit var ctx: Context
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -42,6 +48,7 @@ class MapFragment : Fragment(), MapContract.MapView, OnMapReadyCallback {
     }
 
     override fun onMapReady(mapboxMap: MapboxMap) {
+        this.mapboxMap = mapboxMap
         mapboxMap.setStyle(Style.MAPBOX_STREETS, object : Style.OnStyleLoaded {
             override fun onStyleLoaded(style: Style) {
                 val markerDrawable = ContextCompat.getDrawable(ctx, R.drawable.ic_place_red_24dp)
@@ -50,17 +57,28 @@ class MapFragment : Fragment(), MapContract.MapView, OnMapReadyCallback {
                 } ?: Log.e(this.javaClass.simpleName, "failed to load marker resource")
                 symbolManager = SymbolManager(mapView, mapboxMap, style)
                 presenter.loadLocations()
+                zoomToLocation?.let { presenter.loadSingleLocation(it) }
             }
         })
     }
 
-    override fun renderMarkers(coordinates: List<LatLng>) {
-        for (coordinate in coordinates) {
+    override fun renderMarkers(locations: List<Location>) {
+        for (location in locations) {
             val symbolOptions = SymbolOptions()
-                .withLatLng(coordinate)
+                .withLatLng(LatLng(location.latitude, location.longitude))
+                .withTextField(location.name)
+                .withTextOffset(arrayOf(0f, 2f))
                 .withIconImage(MARKER_ICON)
             symbolManager.create(symbolOptions)
         }
+    }
+
+    override fun zoomToLocation(coordinate: LatLng) {
+        val position = CameraPosition.Builder()
+            .target(coordinate)
+            .zoom(16.0)
+            .build()
+        mapboxMap?.animateCamera(CameraUpdateFactory.newCameraPosition(position))
     }
 
     override fun onStart() {
@@ -101,7 +119,10 @@ class MapFragment : Fragment(), MapContract.MapView, OnMapReadyCallback {
     override fun provideContext(): Context = ctx
 
     companion object {
-        const val MAPBOX_KEY = "pk.eyJ1IjoidG9tbGluc29uNjMxIiwiYSI6ImNqeGR5aGtseTBqZHIzeW13bnV6ZXFtdWgifQ.phJvUqBz9mgl2GVz8o2zuA"
+        const val MAPBOX_KEY =
+            "pk.eyJ1IjoidG9tbGluc29uNjMxIiwiYSI6ImNqeGR5aGtseTBqZHIzeW13bnV6ZXFtdWgifQ.phJvUqBz9mgl2GVz8o2zuA"
         const val MARKER_ICON = "marker_icon"
+
+        fun newInstance(location: Int?): MapFragment = MapFragment().apply { zoomToLocation = location }
     }
 }

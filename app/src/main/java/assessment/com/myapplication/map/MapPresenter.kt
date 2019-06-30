@@ -11,8 +11,15 @@ class MapPresenter constructor(private val view: MapContract.MapView): MapContra
     }
 
     override fun onLocationsLoaded(locations: List<Location>) {
-        val coordinates = locations.map { location -> LatLng(location.latitude, location.longitude) }
-        view.renderMarkers(coordinates)
+        view.renderMarkers(locations)
+    }
+
+    override fun loadSingleLocation(id: Int) {
+        model.fetchSingleLocation(id)
+    }
+
+    override fun onSingleLocationLoaded(location: Location) {
+        view.zoomToLocation(LatLng(location.latitude, location.longitude))
     }
 
     override fun provideContext() = view.provideContext()

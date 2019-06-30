@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout
         xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:app="http://schemas.android.com/apk/res-auto" xmlns:tools="http://schemas.android.com/tools"
         xmlns:mapbox="http://schemas.android.com/apk/res-auto"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
@@ -10,8 +9,8 @@
             android:id="@+id/map"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            mapbox:mapbox_cameraTargetLat="40.692400"
-            mapbox:mapbox_cameraTargetLng="-73.985980"
-            mapbox:mapbox_cameraZoom="11"/>
+            mapbox:mapbox_cameraTargetLat="40.694"
+            mapbox:mapbox_cameraTargetLng="-73.988"
+            mapbox:mapbox_cameraZoom="15"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
