@@ -5,10 +5,8 @@ import androidx.room.Room
 import assessment.com.myapplication.data.GTService
 import assessment.com.myapplication.data.Location
 import assessment.com.myapplication.data.room.LocationDatabase
-import assessment.com.myapplication.data.room.LocationTask
 import assessment.com.myapplication.data.room.LocationsTask
 import assessment.com.myapplication.data.room.RoomLocation
-import assessment.com.myapplication.map.MapModel
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -26,14 +24,18 @@ class ListModel constructor(private val presenter: ListContract.ListPresenter) :
     override fun viewCreated() {
         presenter.provideContext().let { context ->
             database =
-                Room.databaseBuilder(context, LocationDatabase::class.java, MapModel.DATABASE_NAME)
+                Room.databaseBuilder(context, LocationDatabase::class.java, DATABASE_NAME)
                     .build()
             retrofit = Retrofit.Builder()
-                .baseUrl(MapModel.BASE_URL)
+                .baseUrl(BASE_URL)
                 .addConverterFactory(GsonConverterFactory.create())
                 .build()
             service = retrofit.create(GTService::class.java)
         }
+    }
+
+    override fun explicitRefresh() {
+        fetchLocationsRemoteAndStore()
     }
 
     override fun fetchLocations() {
@@ -68,5 +70,10 @@ class ListModel constructor(private val presenter: ListContract.ListPresenter) :
                 Log.e(this.javaClass.simpleName, t.localizedMessage)
             }
         })
+    }
+
+    companion object {
+        const val BASE_URL = "https://annetog.gotenna.com/development/scripts/"
+        const val DATABASE_NAME = "location-database"
     }
 }

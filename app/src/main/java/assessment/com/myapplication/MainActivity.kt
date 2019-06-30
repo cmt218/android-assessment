@@ -1,6 +1,7 @@
 package assessment.com.myapplication
 
 import android.os.Bundle
+import android.os.PersistableBundle
 import androidx.appcompat.app.AppCompatActivity
 import assessment.com.myapplication.list.ListFragment
 
@@ -10,10 +11,16 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        supportFragmentManager
-            .beginTransaction()
-            .replace(R.id.container, ListFragment())
-            .addToBackStack(null)
-            .commit()
+        if(savedInstanceState == null) {
+            supportFragmentManager
+                .beginTransaction()
+                .replace(R.id.container, ListFragment())
+                .addToBackStack(null)
+                .commit()
+        }
+    }
+
+    override fun onSaveInstanceState(outState: Bundle?, outPersistentState: PersistableBundle?) {
+        super.onSaveInstanceState(outState, outPersistentState)
     }
 }
