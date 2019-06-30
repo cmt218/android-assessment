@@ -9,7 +9,7 @@ import androidx.recyclerview.widget.RecyclerView
 import assessment.com.myapplication.R
 import assessment.com.myapplication.data.Location
 
-class ListAdapter(private val locations: List<Location>, private val onListingClicked: (Int) -> Unit) : RecyclerView.Adapter<ListAdapter.ListViewHolder>() {
+class ListAdapter(private val locations: MutableList<Location>, private val onListingClicked: (Int) -> Unit) : RecyclerView.Adapter<ListAdapter.ListViewHolder>() {
 
     class ListViewHolder(listView: View) : RecyclerView.ViewHolder(listView) {
         val name = listView.findViewById(R.id.name) as? TextView
@@ -28,6 +28,13 @@ class ListAdapter(private val locations: List<Location>, private val onListingCl
         holder.name?.text = item.name
         holder.description?.text = item.description
         holder.container?.setOnClickListener { onListingClicked(item.id) }
+    }
+
+
+    public fun clear() {
+        val size = locations.size
+        locations.clear()
+        notifyItemRangeRemoved(0, size)
     }
 
     override fun getItemCount() = locations.size

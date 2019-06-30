@@ -10,10 +10,12 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        supportFragmentManager
-            .beginTransaction()
-            .replace(R.id.container, ListFragment())
-            .addToBackStack(null)
-            .commit()
+        if(savedInstanceState == null) {
+            supportFragmentManager
+                .beginTransaction()
+                .replace(R.id.container, ListFragment())
+                .addToBackStack(null)
+                .commit()
+        }
     }
 }
