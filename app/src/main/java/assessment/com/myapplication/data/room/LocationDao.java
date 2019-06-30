@@ -14,4 +14,7 @@ public interface LocationDao {
 
     @Query("SELECT * FROM RoomLocation")
     List<RoomLocation> getAll();
+
+    @Query("SELECT * FROM RoomLocation WHERE id = :id")
+    RoomLocation getSingle(int id);
 }

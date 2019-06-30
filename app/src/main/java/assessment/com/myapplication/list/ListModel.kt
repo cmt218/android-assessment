@@ -1,4 +1,4 @@
-package assessment.com.myapplication.map
+package assessment.com.myapplication.list
 
 import android.util.Log
 import androidx.room.Room
@@ -8,6 +8,7 @@ import assessment.com.myapplication.data.room.LocationDatabase
 import assessment.com.myapplication.data.room.LocationTask
 import assessment.com.myapplication.data.room.LocationsTask
 import assessment.com.myapplication.data.room.RoomLocation
+import assessment.com.myapplication.map.MapModel
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -15,7 +16,7 @@ import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import java.util.concurrent.Executors
 
-class MapModel constructor(private val presenter: MapContract.MapPresenter) : MapContract.MapModel {
+class ListModel constructor(private val presenter: ListContract.ListPresenter) : ListContract.ListModel {
 
     private lateinit var database: LocationDatabase
     private lateinit var retrofit: Retrofit
@@ -25,10 +26,10 @@ class MapModel constructor(private val presenter: MapContract.MapPresenter) : Ma
     override fun viewCreated() {
         presenter.provideContext().let { context ->
             database =
-                Room.databaseBuilder(context, LocationDatabase::class.java, DATABASE_NAME)
+                Room.databaseBuilder(context, LocationDatabase::class.java, MapModel.DATABASE_NAME)
                     .build()
             retrofit = Retrofit.Builder()
-                .baseUrl(BASE_URL)
+                .baseUrl(MapModel.BASE_URL)
                 .addConverterFactory(GsonConverterFactory.create())
                 .build()
             service = retrofit.create(GTService::class.java)
@@ -37,16 +38,11 @@ class MapModel constructor(private val presenter: MapContract.MapPresenter) : Ma
 
     override fun fetchLocations() {
         val dbListings = LocationsTask(database).execute().get() ?: mutableListOf()
-        if (dbListings.isNotEmpty()) {
+        if(dbListings.isNotEmpty()) {
             presenter.onLocationsLoaded(dbListings)
         } else {
             fetchLocationsRemoteAndStore()
         }
-    }
-
-    override fun fetchSingleLocation(id: Int) {
-        val dbListing = LocationTask(database, id).execute().get()
-        presenter.onSingleLocationLoaded(dbListing)
     }
 
     private fun fetchLocationsRemoteAndStore() {
@@ -72,10 +68,5 @@ class MapModel constructor(private val presenter: MapContract.MapPresenter) : Ma
                 Log.e(this.javaClass.simpleName, t.localizedMessage)
             }
         })
-    }
-
-    companion object {
-        const val BASE_URL = "https://annetog.gotenna.com/development/scripts/"
-        const val DATABASE_NAME = "location-database"
     }
 }
