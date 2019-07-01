@@ -4,7 +4,6 @@ import android.Manifest
 import android.content.Context
 import android.content.pm.PackageManager
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -63,14 +62,21 @@ class MapFragment : Fragment(), MapContract.MapView, OnMapReadyCallback {
         this.mapboxMap = mapboxMap
         mapboxMap.setStyle(Style.MAPBOX_STREETS, object : Style.OnStyleLoaded {
             override fun onStyleLoaded(style: Style) {
+
+                // Specify drawable to use for location markers
                 val markerDrawable = ContextCompat.getDrawable(ctx, R.drawable.ic_place_red_24dp)
                 markerDrawable?.let { drawable ->
                     style.addImage(MARKER_ICON, drawable)
-                } ?: Log.e(this.javaClass.simpleName, "failed to load marker resource")
+                }
+
                 symbolManager = mapView?.let { SymbolManager(it, mapboxMap, style) }
                 locationButton.setOnClickListener { enableLocation(style, true) }
                 presenter.loadLocations()
+
+                // If fragment was initialized with a location id, load its info
                 zoomToLocation?.let { presenter.loadSingleLocation(it) }
+
+                // Enable user location if they have previously consented and are returning (or rotating)
                 if (ContextCompat.checkSelfPermission(ctx, Manifest.permission.ACCESS_FINE_LOCATION) ==
                     PackageManager.PERMISSION_GRANTED
                 ) {
@@ -80,6 +86,7 @@ class MapFragment : Fragment(), MapContract.MapView, OnMapReadyCallback {
         })
     }
 
+    // Add markers at correct locations with labels
     override fun renderMarkers(locations: List<Location>) {
         val symbolOptions = SymbolOptions()
             .withIconImage(MARKER_ICON)
@@ -93,6 +100,7 @@ class MapFragment : Fragment(), MapContract.MapView, OnMapReadyCallback {
         }
     }
 
+    // Tell the camera to center and zoom in on a given location
     override fun zoomToLocation(coordinate: LatLng) {
         val position = CameraPosition.Builder()
             .target(coordinate)
@@ -101,6 +109,7 @@ class MapFragment : Fragment(), MapContract.MapView, OnMapReadyCallback {
         mapboxMap?.cameraPosition = position
     }
 
+    // Get location and add user marker to map if permissions are granted, otherwise request them
     @SuppressWarnings("MissingPermission")
     private fun enableLocation(style: Style, animateToPosition: Boolean) {
         if (ContextCompat.checkSelfPermission(ctx, Manifest.permission.ACCESS_FINE_LOCATION) ==
@@ -119,6 +128,7 @@ class MapFragment : Fragment(), MapContract.MapView, OnMapReadyCallback {
                 cameraMode = CameraMode.TRACKING
             }
 
+            // Camera animates to user position by default, but only should if they press the location button
             if (!animateToPosition) {
                 previous?.let {
                     mapboxMap?.cameraPosition = it
@@ -129,6 +139,7 @@ class MapFragment : Fragment(), MapContract.MapView, OnMapReadyCallback {
         }
     }
 
+    // Handle result of prompting user for location access
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
         if (requestCode == PERMISSION_ACCESS_LOCATION) {
             if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {

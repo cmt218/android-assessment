@@ -1,10 +1,11 @@
 package assessment.com.myapplication.map
 
+import androidx.annotation.VisibleForTesting
 import assessment.com.myapplication.data.Location
 import com.mapbox.mapboxsdk.geometry.LatLng
 
 class MapPresenter constructor(private val view: MapContract.MapView): MapContract.MapPresenter {
-    private val model: MapContract.MapModel = MapModel(this)
+    private var model: MapContract.MapModel = MapModel(this)
 
     override fun loadLocations() {
         model.fetchLocations()
@@ -26,5 +27,10 @@ class MapPresenter constructor(private val view: MapContract.MapView): MapContra
 
     override fun viewCreated() {
         model.viewCreated()
+    }
+
+    @VisibleForTesting
+    fun setModel(model: MapContract.MapModel) {
+        this.model = model
     }
 }
