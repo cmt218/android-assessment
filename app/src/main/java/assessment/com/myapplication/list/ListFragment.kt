@@ -42,10 +42,13 @@ class ListFragment : Fragment(), ListContract.ListView {
         spinner = view.findViewById(R.id.loading_spinner)
         viewAll = view.findViewById(R.id.view_all)
         viewAll.setOnClickListener { onListingClicked(null) }
+
+        // Request location data after reference to recyclerView and other UI is established
         presenter.loadLocations()
         return view
     }
 
+    // Populates the recyclerview with listings and designates a click action
     override fun renderListings(locations: List<Location>) {
         listAdapter = ListAdapter(locations.toMutableList(), { id -> onListingClicked(id) })
         listManager = LinearLayoutManager(ctx)
@@ -64,6 +67,7 @@ class ListFragment : Fragment(), ListContract.ListView {
         spinner.visibility = View.GONE
     }
 
+    // On list click, open the map and let it know which location to focus camera on
     private fun onListingClicked(id: Int?) {
         activity?.supportFragmentManager
             ?.beginTransaction()

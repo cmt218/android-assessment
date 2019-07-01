@@ -9,12 +9,15 @@ import java.util.List;
 
 @Dao
 public interface LocationDao {
+    // Inserts/updates the locations stored locally
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    public void insertLocations(List<RoomLocation> locations);
+    void insertLocations(List<RoomLocation> locations);
 
+    // Fetches all stored locations
     @Query("SELECT * FROM RoomLocation")
     List<RoomLocation> getAll();
 
+    // Fetches one stored location by unique id
     @Query("SELECT * FROM RoomLocation WHERE id = :id")
     RoomLocation getSingle(int id);
 }
