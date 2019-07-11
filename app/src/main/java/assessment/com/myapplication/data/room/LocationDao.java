@@ -13,6 +13,10 @@ public interface LocationDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     void insertLocations(List<RoomLocation> locations);
 
+    // Inserts a single new location to the database
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    void insertLocation(RoomLocation location);
+
     // Fetches all stored locations
     @Query("SELECT * FROM RoomLocation")
     List<RoomLocation> getAll();
