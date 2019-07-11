@@ -19,6 +19,7 @@ class ListPresenter constructor(private val view: ListContract.ListView) : ListC
 
     override fun onLocationsLoaded(locations: List<Location>) {
         view.hideSpinner()
+        locations.sortedBy { it.name }
         view.renderListings(locations)
     }
 

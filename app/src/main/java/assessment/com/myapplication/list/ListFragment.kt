@@ -12,17 +12,19 @@ import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import assessment.com.myapplication.R
+import assessment.com.myapplication.add.AddFragment
 import assessment.com.myapplication.data.Location
 import assessment.com.myapplication.list.adapter.ListAdapter
 import assessment.com.myapplication.map.MapFragment
 
-class ListFragment : Fragment(), ListContract.ListView {
+class  ListFragment : Fragment(), ListContract.ListView {
     private var listAdapter: ListAdapter? = null
 
     private lateinit var ctx: Context
     private lateinit var presenter: ListContract.ListPresenter
     private lateinit var listRecycler: RecyclerView
     private lateinit var listManager: RecyclerView.LayoutManager
+    private lateinit var addButton: ImageButton
     private lateinit var refreshButton: ImageButton
     private lateinit var spinner: ProgressBar
     private lateinit var viewAll: TextView
@@ -37,6 +39,8 @@ class ListFragment : Fragment(), ListContract.ListView {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val view = inflater.inflate(R.layout.fragment_list, container, false)
         listRecycler = view.findViewById(R.id.list_recycler)
+        addButton = view.findViewById(R.id.add_button)
+        addButton.setOnClickListener { onAddClicked() }
         refreshButton = view.findViewById(R.id.refresh_button)
         refreshButton.setOnClickListener { presenter.explicitRefresh() }
         spinner = view.findViewById(R.id.loading_spinner)
@@ -72,6 +76,14 @@ class ListFragment : Fragment(), ListContract.ListView {
         activity?.supportFragmentManager
             ?.beginTransaction()
             ?.replace(R.id.container, MapFragment.newInstance(id))
+            ?.addToBackStack(null)
+            ?.commit()
+    }
+
+    private fun onAddClicked() {
+        activity?.supportFragmentManager
+            ?.beginTransaction()
+            ?.replace(R.id.container, AddFragment())
             ?.addToBackStack(null)
             ?.commit()
     }
